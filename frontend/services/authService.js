@@ -12,9 +12,9 @@ const api = axios.create({
   timeout: 30000,
   headers: {
     'Content-Type': 'application/json',
-    'Accept': 'application/json'
+    Accept: 'application/json',
   },
-  withCredentials: true
+  withCredentials: true,
 });
 
 // 재시도 설정
@@ -24,7 +24,7 @@ const RETRY_CONFIG = {
   maxDelay: 5000,
   backoffFactor: 2,
   retryableStatuses: [408, 429, 500, 502, 503, 504],
-  retryableErrors: ['ECONNABORTED', 'ETIMEDOUT', 'ENOTFOUND', 'ENETUNREACH', 'ERR_NETWORK']
+  retryableErrors: ['ECONNABORTED', 'ETIMEDOUT', 'ENOTFOUND', 'ENETUNREACH', 'ERR_NETWORK'],
 };
 
 // 유효성 검증 함수
@@ -49,13 +49,14 @@ const validateCredentials = (credentials) => {
 
   return {
     email: email.trim(),
-    password: password
+    password: password,
   };
 };
 
 // 재시도 딜레이 계산
 const getRetryDelay = (retryCount) => {
-  const delay = RETRY_CONFIG.baseDelay * 
+  const delay =
+    RETRY_CONFIG.baseDelay *
     Math.pow(RETRY_CONFIG.backoffFactor, retryCount) *
     (1 + Math.random() * 0.1);
   return Math.min(delay, RETRY_CONFIG.maxDelay);
@@ -71,7 +72,7 @@ const isRetryableError = (error) => {
 
 // 요청 인터셉터
 api.interceptors.request.use(
-  config => {
+  (config) => {
     // 요청 데이터 검증
     if (!config.data || typeof config.data !== 'object') {
       config.data = {};
@@ -98,7 +99,7 @@ api.interceptors.request.use(
 
     return config;
   },
-  error => Promise.reject(error)
+  (error) => Promise.reject(error)
 );
 
 class AuthService {
@@ -120,7 +121,7 @@ class AuthService {
           profileImage: response.data.user.profileImage,
           token: response.data.token,
           sessionId: response.data.sessionId,
-          lastActivity: Date.now()
+          lastActivity: Date.now(),
         };
 
         localStorage.setItem('user', JSON.stringify(userData));
@@ -129,7 +130,6 @@ class AuthService {
       }
 
       throw new Error(response.data?.message || '로그인에 실패했습니다.');
-
     } catch (error) {
       console.error('Login error:', error);
 
@@ -154,7 +154,6 @@ class AuthService {
     }
   }
 
-
   // logout 메소드 수정
   async logout() {
     try {
@@ -165,7 +164,7 @@ class AuthService {
     } catch (error) {
       console.error('Logout error:', error);
     } finally {
-      console.log("??????");
+      console.log('??????');
       socketService.disconnect();
       localStorage.removeItem('user');
       // 인증 상태 변경 이벤트 발생
@@ -187,7 +186,7 @@ class AuthService {
           profileImage: response.data.user.profileImage,
           token: response.data.token,
           sessionId: response.data.sessionId,
-          lastActivity: Date.now()
+          lastActivity: Date.now(),
         };
         localStorage.setItem('user', JSON.stringify(userInfo));
 
@@ -203,7 +202,7 @@ class AuthService {
       throw this._handleError(error);
     }
   }
-  
+
   async updateProfile(data) {
     try {
       const user = this.getCurrentUser();
@@ -211,17 +210,13 @@ class AuthService {
         throw new Error('인증 정보가 없습니다.');
       }
 
-      const response = await axios.put(
-        `${API_URL}/api/users/profile`,
-        data,
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            'x-auth-token': user.token,
-            'x-session-id': user.sessionId
-          }
-        }
-      );
+      const response = await axios.put(`${API_URL}/api/users/profile`, data, {
+        headers: {
+          'Content-Type': 'application/json',
+          'x-auth-token': user.token,
+          'x-session-id': user.sessionId,
+        },
+      });
 
       if (response.data?.success) {
         // 현재 사용자 정보 업데이트
@@ -229,20 +224,19 @@ class AuthService {
           ...user,
           ...response.data.user,
           token: user.token,
-          sessionId: user.sessionId
+          sessionId: user.sessionId,
         };
-        
+
         localStorage.setItem('user', JSON.stringify(updatedUser));
         window.dispatchEvent(new Event('userProfileUpdate'));
-        
+
         return updatedUser;
       }
 
       throw new Error(response.data?.message || '프로필 업데이트에 실패했습니다.');
-
     } catch (error) {
       console.error('Profile update error:', error);
-      
+
       if (error.response?.status === 401) {
         try {
           const refreshed = await this.refreshToken();
@@ -269,14 +263,14 @@ class AuthService {
         `${API_URL}/api/users/profile`,
         {
           currentPassword,
-          newPassword
+          newPassword,
         },
         {
           headers: {
             'Content-Type': 'application/json',
             'x-auth-token': user.token,
-            'x-session-id': user.sessionId
-          }
+            'x-session-id': user.sessionId,
+          },
         }
       );
 
@@ -285,7 +279,6 @@ class AuthService {
       }
 
       throw new Error(response.data?.message || '비밀번호 변경에 실패했습니다.');
-
     } catch (error) {
       console.error('Password change error:', error);
 
@@ -306,7 +299,7 @@ class AuthService {
 
       throw this._handleError(error);
     }
-  }  
+  }
 
   getCurrentUser() {
     try {
@@ -315,7 +308,7 @@ class AuthService {
 
       const user = JSON.parse(userStr);
       const SESSION_TIMEOUT = 2 * 60 * 60 * 1000;
-      
+
       if (Date.now() - user.lastActivity > SESSION_TIMEOUT) {
         this.logout();
         return null;
@@ -350,8 +343,8 @@ class AuthService {
       const response = await axiosInstance.post('/api/auth/verify-token', {
         headers: {
           'x-auth-token': user.token,
-          'x-session-id': user.sessionId
-        }
+          'x-session-id': user.sessionId,
+        },
       });
 
       if (response.data.success) {
@@ -375,7 +368,7 @@ class AuthService {
       throw error;
     }
   }
-  
+
   async refreshToken() {
     try {
       const user = this.getCurrentUser();
@@ -387,7 +380,7 @@ class AuthService {
         const updatedUser = {
           ...user,
           token: response.data.token,
-          lastActivity: Date.now()
+          lastActivity: Date.now(),
         };
         localStorage.setItem('user', JSON.stringify(updatedUser));
         return response.data.token;
@@ -408,38 +401,39 @@ class AuthService {
       }
 
       // API_URL이 없으면 연결 실패로 처리
+      console.log('gggg', API_URL);
       if (!API_URL) {
         console.warn('API_URL is not defined');
         throw new Error('API URL이 설정되지 않았습니다.');
       }
 
       console.log('Checking server at:', API_URL);
-      
+
       const response = await api.get('/health', {
         timeout: 3000, // 타임아웃을 3초로 단축
-        validateStatus: (status) => status < 500 // 5xx 에러만 실제 에러로 처리
+        validateStatus: (status) => status < 500, // 5xx 에러만 실제 에러로 처리
       });
-      
+
       return response.data?.status === 'ok' || response.status === 200;
     } catch (error) {
       console.error('Server connection check failed:', error);
-      
+
       // 네트워크 에러나 타임아웃은 더 구체적인 메시지 제공
       if (error.code === 'ECONNABORTED' || error.message.includes('timeout')) {
         throw new Error('서버 응답 시간이 초과되었습니다.');
       }
-      
+
       if (error.code === 'ERR_NETWORK' || error.message.includes('Network Error')) {
         throw new Error('네트워크 연결을 확인해주세요.');
       }
-      
+
       throw this._handleError(error);
     }
   }
 
   _handleError(error) {
     if (error.isNetworkError) return error;
-    
+
     if (axios.isAxiosError(error)) {
       if (!error.response) {
         return new Error('서버와 통신할 수 없습니다. 네트워크 연결을 확인해주세요.');
