@@ -317,6 +317,7 @@ const Login = () => {
               <Button
                 onClick={() => router.push('/register')}
                 disabled={loading || !serverStatus.connected}
+                type="button"
               >
                 회원가입
               </Button>

@@ -401,7 +401,6 @@ class AuthService {
       }
 
       // API_URL이 없으면 연결 실패로 처리
-      console.log('gggg', API_URL);
       if (!API_URL) {
         console.warn('API_URL is not defined');
         throw new Error('API URL이 설정되지 않았습니다.');
