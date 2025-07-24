@@ -3,10 +3,8 @@ import {
   PdfIcon as FileText, 
   ImageIcon as Image, 
   MovieIcon as Film, 
-  CorrectOutlineIcon as CheckCheck, 
-  CorrectOutlineIcon as Check, 
-  MusicIcon as Music, 
-  ExternalLinkIcon as ExternalLink, 
+  SoundOnIcon as SoundOn,
+  OpenInNewOutlineIcon as OpenInNewOutline,
   DownloadIcon as Download,
   ErrorCircleIcon as AlertCircle 
 } from '@vapor-ui/icons';
@@ -63,7 +61,7 @@ const FileMessage = ({
 
     if (mimetype.startsWith('image/')) return <Image {...iconProps} color="#00C853" />;
     if (mimetype.startsWith('video/')) return <Film {...iconProps} color="#2196F3" />;
-    if (mimetype.startsWith('audio/')) return <Music {...iconProps} color="#9C27B0" />;
+    if (mimetype.startsWith('audio/')) return <SoundOn {...iconProps} color="#9C27B0" />;
     return <FileText {...iconProps} color="#ffffff" />;
   };
 
@@ -221,7 +219,7 @@ const FileMessage = ({
           onClick={handleViewInNewTab}
           title="새 탭에서 보기"
         >
-          <ExternalLink size={16} />
+          <OpenInNewOutline size={16} />
           <span>새 탭에서 보기</span>
         </Button>
         <Button
