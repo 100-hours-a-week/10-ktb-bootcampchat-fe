@@ -206,6 +206,13 @@ body {
   font-size: var(--vapor-font-size-200);
 }
 
+.md-ol {
+  list-style-type: decimal;
+}
+.md-ul {
+  list-style-type: '· ';
+}
+
 /* Chat Rooms List */
 .chat-rooms-card {
   width: 100%;
